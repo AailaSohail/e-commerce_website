@@ -1,0 +1,89 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+{% if user.is_authenticated %}
+    {% if watchlist %}
+    <form action="{% url 'removewatch' id=item.id %}" method="post">
+        {% csrf_token %}
+    <button type="submit" name="watchlist" class="btn btn-danger float-right">Remove From Watchlist</button>
+    </form>
+    {% else %}
+    <form action="{% url 'addwatch' id=item.id %}" method="post">
+        {% csrf_token %}
+    <button type="submit" name="watchlist" class="btn btn-warning float-right">Add to Watchlist</button>
+    </form>
+    {% endif %}
+    {% if isowner and item.active %}
+    <form action="{% url 'closebid' id=item.id %}" method="post">
+        {% csrf_token %}
+    <button type="submit" name="close" class="btn btn-danger float-left">Close Listing</button>
+    </form>
+{% endif %}
+{% endif %}
+<center>
+    <h2> {{item.title}}</h2>
+</center> 
+<hr>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+    <div class="alert alert-success" role="alert">{{ message }}</div>
+    {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+    <div class="alert alert-danger" role="alert">{{ message }}</div>
+    {% else %}
+    <div class="alert alert-info" role="alert">{{ message }}</div>
+    {% endif %}
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if user == bidder.buyer and not item.active %}
+<div class="alert alert-info" role="alert">Congragulations! You Have Won the Item</div>
+{% endif %} 
+
+</br>
+    <div class="row">
+        <img src="{{ item.image }}" class="image" alt="{{ item.title }}">
+        <div class="columns">
+        <h5>Seller:</h5>
+        <p> {{ item.owner}}</p>
+        <h5>Description:</h5>
+        <p> {{ item.description}}</p>
+        <h5>Category :</h5>
+        <p> {{ item.category }}</p>
+        <h5>Original Price:</h5>
+        <p> ${{ item.price }}</p>
+        <h5>Current Bid:</h5>
+        <p> ${{ bid }}</p>
+        {% if user.is_authenticated and item.active %}
+        <form action="{% url 'bid' id=item.id %}" method="POST" >
+            {% csrf_token %}
+            <div class="from-group">
+                <label form="price">Place a Bid</label>
+                <input type="number" name="bid" class="form-control" id="bid" placeholder="Bid">
+                </br>
+                <button type="submit" class="btn btn-info">Bid</button>
+            </div>
+        </form>
+        {% endif %}
+        </div>
+    </div>
+</br>
+<hr>
+<h4>Comments</h4>
+    {% for comment in comments %}
+      <p> {{comment.comment}} </br> Posted by <strong>{{comment.user}}</strong></p>
+    {% endfor %}
+    {% if user.is_authenticated and item.active %}
+<form action="{% url 'comment' id=item.id %}" method="POST">
+    {% csrf_token %}
+    <div class="from-group">
+        <label form="title">Comment</label>
+        <textarea type="text" name="comment" class="form-control" id="comment"placeholder="Comment"></textarea>
+        </br>
+        <button type="submit" class="btn btn-info">Comment</button>
+    </div>
+</form>
+{% endif %}
+{% endblock %}

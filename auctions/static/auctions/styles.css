@@ -1,0 +1,19 @@
+body {
+    padding: 10px;
+}
+.card{
+    transition: all 0.3s;
+    margin: 25px;   
+    margin-left:0px;
+}
+.card:hover{
+    transform: scale(1.05); 
+}
+
+.image{
+    max-height: 400px; 
+    margin-left:100px
+}
+.columns{
+    margin-left: 25px;
+}
